@@ -33,7 +33,7 @@ def select_file():
     entry_path.insert(0, path)
 
 
-#-----------------Tworzenie okna początkowego------------------
+#<-----------------Tworzenie okna początkowego------------------>
 root = tk.Tk()
 root.title("Ustawienia symulacji")
 window_width = 600
@@ -106,7 +106,7 @@ btn_start.grid(row=15, column=0, columnspan=3, pady=30, padx=50, sticky="we")
 
 root.mainloop()
 
-#-----------------Wczytanie danych------------------
+#<-----------------Wczytanie danych------------------>
 
 imgIN = Image.open(params['file_path']).convert('L')
 img = imgIN.transpose(Image.FLIP_TOP_BOTTOM)
@@ -122,6 +122,7 @@ steps = 3000
 dt = 0.1
 trajectory = []
 
+#<-----------------Czesc fizyczna------------------>
 
 for _ in range(steps):
     ix, iy = int(pos[0]), int(pos[1])
@@ -142,20 +143,18 @@ for _ in range(steps):
         trajectory.pop([-1][-1])
         break
 
-#-----------------Animacja------------------
+#<-----------------Animacja------------------>
 traj = np.array(trajectory)
 fig, ax = plt.subplots(figsize=(12, 8))
 im = ax.imshow(B_field, cmap='PuOr_r', origin='lower')
 ax.axis('image')
 
-# Tworzymy pustą linię (trajektoria) i punkt (cząstka)
 line, = ax.plot([], [], color='green', linewidth=2, label="Trajektoria")
 point, = ax.plot([], [], 'ro', markersize=8, label="Cząstka")  # Czerwona kropka
 
 ax.set_title("Ruch cząstki w zmiennym polu magnetycznym")
 ax.legend()
 
-# Dodatki (colorbar itp.)
 divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im, cax=cax)
@@ -168,7 +167,6 @@ def frame(i):
     point.set_data([traj[i, 0]], [traj[i, 1]])
 
     return line, point
-
 
 
 anim = FuncAnimation(
