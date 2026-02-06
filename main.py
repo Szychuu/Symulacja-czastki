@@ -45,11 +45,9 @@ center_x = int(screen_width/2 - window_width / 2)
 center_y = int(screen_height/2 - window_height / 2)
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
-# Layout (siatka)
 root.grid_columnconfigure(0, weight=1)
 root.grid_columnconfigure(1, weight=2)
 root.grid_columnconfigure(2, weight=1)
-
 
 custom_font = ("Arial", 12)
 header_font = ("Arial", 14, "bold")
@@ -135,12 +133,9 @@ for _ in range(steps):
         F = q * np.array([vel[1] * Bz, -vel[0] * Bz])
 
         acc = F / m
-        # print(f'acc: {acc}')
 
         vel += acc * dt
-        # print(f'vel: {vel}')
         pos += vel * dt
-        # print(f'pos: {pos}')
 
         trajectory.append(pos.copy())
     else:
@@ -157,7 +152,7 @@ ax.axis('image')
 line, = ax.plot([], [], color='green', linewidth=2, label="Trajektoria")
 point, = ax.plot([], [], 'ro', markersize=8, label="Cząstka")  # Czerwona kropka
 
-ax.set_title("Ruch cząstki w zmiennym polu magnetycznym") [-1]
+ax.set_title("Ruch cząstki w zmiennym polu magnetycznym")
 ax.legend()
 
 # Dodatki (colorbar itp.)
@@ -175,7 +170,7 @@ def frame(i):
     return line, point
 
 
-# Ważne: liczba frames nie powinna przekraczać długości Twojej tablicy traj
+
 anim = FuncAnimation(
     fig=fig,
     func=frame,
@@ -185,4 +180,3 @@ anim = FuncAnimation(
 )
 
 plt.show()
-# HTML(anim.to_jshtml())
