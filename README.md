@@ -1,3 +1,6 @@
-# Repozytorium pracy projektowej z przedmiotu FOG_25Z - ruch cząstki naładowanej ładunkiem w polu magentycznym
+## Wprowadzenie
+Repozytorium pracy projektowej z przedmiotu FOG_25Z upubliczniające kod projektu - ruch cząstki naładowanej ładunkiem w polu magentycznym
 
-Autorzy: Barłomiej Kozłowski, Borys Szycher
+## Skład zespołu
+- Barłomiej Kozłowski
+- Borys Szycher
