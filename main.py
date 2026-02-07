@@ -1,13 +1,14 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib.animation import FuncAnimation
-from IPython.display import HTML
 from PIL import Image
 from mpl_toolkits.axes_grid1 import make_axes_locatable
 import tkinter as tk
 from tkinter import filedialog, messagebox
 
 params = {}
+
+
 def get_params():
     try:
         params['file_path'] = entry_path.get()
@@ -15,8 +16,8 @@ def get_params():
         params['m'] = float(entry_m.get())
         params['vx'] = float(entry_vx.get())
         params['vy'] = float(entry_vy.get())
-        params['x'] = float(entry_x.get())
-        params['y'] = float(entry_y.get())
+        params['x0'] = float(entry_x.get())
+        params['y0'] = float(entry_y.get())
 
         if not params['file_path']:
             raise ValueError("Wybierz plik obrazu!")
@@ -33,7 +34,8 @@ def select_file():
     entry_path.insert(0, path)
 
 
-#<-----------------Tworzenie okna początkowego------------------>
+# <-----------------Tworzenie okna początkowego------------------>
+
 root = tk.Tk()
 root.title("Ustawienia symulacji")
 window_width = 600
@@ -41,8 +43,8 @@ window_height = 600
 
 screen_width = root.winfo_screenwidth()
 screen_height = root.winfo_screenheight()
-center_x = int(screen_width/2 - window_width / 2)
-center_y = int(screen_height/2 - window_height / 2)
+center_x = int(screen_width / 2 - window_width / 2)
+center_y = int(screen_height / 2 - window_height / 2)
 root.geometry(f'{window_width}x{window_height}+{center_x}+{center_y}')
 
 root.grid_columnconfigure(0, weight=1)
@@ -52,9 +54,7 @@ root.grid_columnconfigure(2, weight=1)
 custom_font = ("Arial", 12)
 header_font = ("Arial", 14, "bold")
 
-
 tk.Label(root, text="Parametry Cząstki", font=header_font).grid(row=0, column=0, columnspan=3, pady=20)
-
 
 tk.Label(root, text="Obraz pola:", font=custom_font).grid(row=1, column=1, sticky="w")
 entry_path = tk.Entry(root, font=custom_font)
@@ -66,7 +66,6 @@ entry_q = tk.Entry(root, font=custom_font, justify='center')
 entry_q.insert(0, "1.0")
 entry_q.grid(row=4, column=1, sticky="we", pady=(0, 10))
 
-
 tk.Label(root, text="Masa (m):", font=custom_font).grid(row=5, column=1, sticky="w")
 entry_m = tk.Entry(root, font=custom_font, justify='center')
 entry_m.insert(0, "1.0")
@@ -74,7 +73,7 @@ entry_m.grid(row=6, column=1, sticky="we", pady=(0, 10))
 
 tk.Label(root, text="Prędkość x (v0_x):", font=custom_font).grid(row=7, column=1, sticky="w")
 entry_vx = tk.Entry(root, font=custom_font, justify='center')
-entry_vx.insert(0, "13.0")
+entry_vx.insert(0, "10.0")
 entry_vx.grid(row=8, column=1, sticky="we", pady=(0, 10))
 
 tk.Label(root, text="Prędkość y (v0_y):", font=custom_font).grid(row=9, column=1, sticky="w")
@@ -92,7 +91,6 @@ entry_y = tk.Entry(root, font=custom_font, justify='center')
 entry_y.insert(0, "200")
 entry_y.grid(row=14, column=1, sticky="we", pady=(0, 10))
 
-
 btn_start = tk.Button(
     root,
     text="URUCHOM SYMULACJĘ",
@@ -106,32 +104,33 @@ btn_start.grid(row=15, column=0, columnspan=3, pady=30, padx=50, sticky="we")
 
 root.mainloop()
 
-#<-----------------Wczytanie danych------------------>
+# <-----------------Wczytanie danych------------------>
 
-imgIN = Image.open(params['file_path']).convert('L')
-img = imgIN.transpose(Image.FLIP_TOP_BOTTOM)
+file_path = params['file_path']
+
+img = Image.open(file_path).convert('L').transpose(Image.Transpose.FLIP_TOP_BOTTOM)
 arr = np.array(img)
 B_field = (arr.astype(float) - 128) / 128.0
 
 q = params['q']
 m = params['m']
 vel = np.array([params['vx'], params['vy']])
-file_path = params['file_path']
-pos = np.array([params['x'], params['y']])
+pos = np.array([params['x0'], params['y0']])
+
 steps = 3000
 dt = 0.1
+
 trajectory = []
 
-#<-----------------Czesc fizyczna------------------>
+# <-----------------Czesc fizyczna------------------>
 
 for _ in range(steps):
     ix, iy = int(pos[0]), int(pos[1])
 
     if 0 <= ix < B_field.shape[1] and 0 <= iy < B_field.shape[0]:
-        Bz = B_field[iy, ix]
+        Bz = B_field[iy, ix] # Induckja magnetyczna pola
 
-        # Siła Lorentza w 2D: Fx = q * vy * Bz, Fy = -q * vx * Bz
-        F = q * np.array([vel[1] * Bz, -vel[0] * Bz])
+        F = q * np.array([vel[1] * Bz, -vel[0] * Bz]) # Siła Lorentza w 2D: Fx = q * vy * Bz, Fy = -q * vx * Bz
 
         acc = F / m
 
@@ -143,15 +142,16 @@ for _ in range(steps):
         trajectory.pop([-1][-1])
         break
 
-#<-----------------Animacja------------------>
+# <-----------------Animacja------------------>
+
 traj = np.array(trajectory)
 fig, ax = plt.subplots(figsize=(12, 8))
 im = ax.imshow(B_field, cmap='PuOr_r', origin='lower')
-ax.axis('image')
 
 line, = ax.plot([], [], color='green', linewidth=2, label="Trajektoria")
-point, = ax.plot([], [], 'ro', markersize=8, label="Cząstka")  # Czerwona kropka
+point, = ax.plot([], [], 'ro', markersize=8, label="Cząstka")
 
+ax.axis('image')
 ax.set_title("Ruch cząstki w zmiennym polu magnetycznym")
 ax.legend()
 
@@ -159,11 +159,11 @@ divider = make_axes_locatable(ax)
 cax = divider.append_axes("right", size="5%", pad=0.1)
 cbar = plt.colorbar(im, cax=cax)
 cbar.set_ticks([-1, -0.75, -0.5, -0.25, 0, 0.25, 0.5, 0.75, 1.0])
+cbar.set_label('Indukcja magnetyczna $B_z$ [T]', fontsize=12, labelpad=10)
 
 
 def frame(i):
     line.set_data(traj[:i, 0], traj[:i, 1])
-
     point.set_data([traj[i, 0]], [traj[i, 1]])
 
     return line, point
